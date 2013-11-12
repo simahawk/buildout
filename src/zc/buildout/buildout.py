@@ -1430,7 +1430,15 @@ def _save_option(option, value, f):
         value = '%(__buildout_space_n__)s' + value[2:]
     if value.endswith('\n\t'):
         value = value[:-2] + '%(__buildout_space_n__)s'
-    print_(option, '=', value, file=f)
+    operator = '='
+    for op in ('+', '-'):
+        if option.endswith(op):
+            # when options are extended we get only the 1st bit
+            # of the operator (like +/-) a the end of the option name
+            # eg: 'environment-vars +'
+            operator = op + operator
+            option = option.rstrip(op)
+    print_(option, operator, value, file=f)
 
 def _save_options(section, options, f):
     print_('[%s]' % section, file=f)
